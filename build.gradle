@@ -1,0 +1,51 @@
+    plugins {
+    id 'java'
+    id "io.freefair.lombok" version "5.0.1"
+    id 'io.qameta.allure' version '2.9.6'
+}
+
+    allure {
+    version = '2.20.0'
+    useJUnit5 {
+        version = '2.20.0'    }
+    }
+
+    group 'ru.netology.domain'
+    version '1.0-SNAPSHOT'
+
+    java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    compileJava.options.encoding = "UTF-8"
+    compileTestJava.options.encoding = "UTF-8"
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+        testImplementation 'com.codeborne:selenide:6.19.1'
+        testImplementation 'com.github.javafaker:javafaker:1.0.2'
+        testImplementation 'io.rest-assured:rest-assured:5.5.0'
+        testImplementation 'com.google.code.gson:gson:2.11.0'
+        testImplementation 'mysql:mysql-connector-java:8.0.33'
+        testImplementation 'org.hamcrest:hamcrest-library:3.0'
+        testImplementation 'commons-dbutils:commons-dbutils:1.8.1'
+        testImplementation group: 'org.postgresql', name: 'postgresql', version: '42.2.14'
+        testImplementation 'io.qameta.allure:allure-selenide:2.20.0'
+        testImplementation 'ch.qos.logback:logback-classic:1.5.7'
+    }
+
+    test {
+        useJUnitPlatform()
+        systemProperty 'selenide.headless', System.getProperty('selenide.headless')
+        systemProperty "db.url", System.getProperty("db.url")
+        systemProperty "login", System.getProperty("login", "app")
+        systemProperty "password", System.getProperty("password", "pass")
+        systemProperty "app.url", System.getProperty("app.url", "http://localhost:8080")
+    }
