@@ -1,6 +1,6 @@
 FROM node:8.16.2-alpine
 WORKDIR /opt/app
-RUN npm install -g npm@7.0.0
+RUN nvm install-latest-npm
 COPY . .
 RUN npm install
 CMD ["npm", "start"]
