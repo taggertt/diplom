@@ -23,9 +23,6 @@ test_script:
   - sudo chmod +x gradlew
   - ps: ./gradlew test --info “-Dselenide.headless=true”
 
-test_results:
-  - path: build/reports/tests/index.html
-
 build_script:
   - sleep 10
   - sudo chmod +x ./gradlew
