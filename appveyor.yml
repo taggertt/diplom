@@ -32,7 +32,8 @@ build_script:
 artifacts:
   - path: build/reports/tests/appveyor
     name: logsAppveyor
+
 test_results:
-  - path: build/test-results/index.html
+  - path: build/reports/tests/index.html
 
   
