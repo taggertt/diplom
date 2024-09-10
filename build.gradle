@@ -44,6 +44,7 @@
         testImplementation 'io.qameta.allure:allure-rest-assured:2.13.9'
         testImplementation 'io.rest-assured:rest-assured:5.5.0'
         testImplementation 'ch.qos.logback:logback-classic:1.5.7'
+        testImplementation 'org.assertj:assertj-core:3.24.2'
     }
 
     test {
