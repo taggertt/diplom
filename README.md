@@ -12,7 +12,7 @@
 4. Запустить Запустите jar-приложение (SUT), используя команду в терминале: "/artifacts java -jar aqa-shop.jar"
 
 # Запуск Авто-тестов
-Запуск авто-тестов производится командой ./gradlew test
+Запуск авто-тестов производится командой ./gradlew test (./gradlew test -D selenide.headless=true для проведения в фоновом режиме).
 
 # Получения отчёта Allure
 1. Выполнить команду gradlew allureReport
