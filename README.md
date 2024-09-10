@@ -16,5 +16,5 @@
 
 # Получения отчёта Allure
 1. Выполнить команду gradlew allureReport
-2. Запустить авто-тесты gradlew clean build allureReport
+2. Запустить авто-тесты ./gradlew test
 3. Для просмотра отчёта Allure необходимо выполнить команду gradlew AllureServe и дождаться открытия отчёта в браузере.
