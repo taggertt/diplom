@@ -4,6 +4,9 @@ import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import org.openqa.selenium.Keys;
 import ru.netology.data.BankCard;
+
+import java.time.Duration;
+
 import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selenide.*;
 
@@ -121,17 +124,6 @@ public class TripPurchasePage {
         yearWarn.shouldHave(text(warnText));
     }
 
-    // Проверяем на истечение строка
-    public void expired(String warnText) {
-        if (yearWarn.isDisplayed()) {
-            yearWarn.shouldHave(visible);
-            yearWarn.shouldHave(text(warnText));
-        } else {
-            monthWarn.shouldHave(visible);
-            monthWarn.shouldHave(text(warnText));
-        }
-    }
-
     // Предупреждение о неверном вводе в поле владелец
     public void warningAboutAnInvalidHolder(String warnText) {
         holderWarn.shouldBe(visible);
@@ -144,14 +136,6 @@ public class TripPurchasePage {
         cvcWarn.shouldHave(text(warnText));
     }
 
-    public void isWarnsInvisible() {
-        cardNumberWarn.shouldNotBe(visible);
-        monthWarn.shouldNotBe(visible);
-        yearWarn.shouldNotBe(visible);
-        holderWarn.shouldNotBe(visible);
-        cvcWarn.shouldNotBe(visible);
-    }
-
     public void isWarnsVisible() {
         cardNumberWarn.shouldBe(visible);
         monthWarn.shouldBe(visible);
@@ -160,25 +144,15 @@ public class TripPurchasePage {
         cvcWarn.shouldBe(visible);
     }
 
-    public void haveApprovedNotification() {
-        approvedNotification.shouldBe(visible);
+    public void haveApprovedNotification (String expectedText) {
+        approvedNotification.shouldHave(text(expectedText), Duration.ofSeconds(10)).shouldBe(visible);
     }
 
-    public void haveDeclinedNotification() {
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        declinedNotification.shouldBe(visible);
+    public void haveDeclinedNotification(String expectedText) {
+        declinedNotification.shouldHave(text(expectedText), Duration.ofSeconds(10)).shouldBe(visible);
     }
 
-    public void haveNotApprovedNotification() {
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        approvedNotification.shouldNotBe(visible);
+    public void noHaveApprovedNotification(String expectedText) {
+        approvedNotification.shouldNotHave(text(expectedText), Duration.ofSeconds(10)).shouldNotBe(visible);
     }
 }

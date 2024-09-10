@@ -109,6 +109,7 @@ public class DataHelper {
     public static BankCard getAnInvalidCardFormat() {
         BankCard card = getBaseCard_en(approvedCardNumber);
         card.setExpireMonth(Integer.toString(faker_en.number().numberBetween(1, 7)));
+        card.setExpireYear(Integer.toString(24));
         return card;
     }
 
@@ -161,12 +162,6 @@ public class DataHelper {
     public static BankCard GettingInvalidCvcCode() {
         BankCard card = getBaseCard_en(approvedCardNumber);
         card.setCvcCode(faker_en.number().digits(2));
-        return card;
-    }
-
-    public static BankCard GettingInvalidCvcCode000() {
-        BankCard card = getBaseCard_en(approvedCardNumber);
-        card.setCvcCode("000");
         return card;
     }
 
