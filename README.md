@@ -10,17 +10,17 @@
 2. Установить Docker и Docker-compose.
 3. Запустить в Docker контейнеры: MySQL, PostgreSQL, Node.Js.
  
-   ```
-   docker-compose up –d
-   ```
+ ```
+ docker-compose up –d
+ ```
    
 4. Запустить jar-приложение (SUT) используя команду в терминале:
-   - для MySQL  
+ - для MySQL  
 
 ```
 java "-Dspring.datasource.url=jdbc:mysql://localhost:3306/app" -jar aqa-shop.jar
 ```
-   - для PostgreSQL
+ - для PostgreSQL
 
 ```
 java "-Dspring.datasource.url=jdbc:postgresql://localhost:5432/app" -jar aqa-shop.jar
