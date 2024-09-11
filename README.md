@@ -14,12 +14,33 @@
    docker-compose up –d
    ```
    
-5. Запустить Запустите jar-приложение (SUT), используя команду в терминале: "/artifacts java -jar aqa-shop.jar"
+4. Запустить jar-приложение (SUT) используя команду в терминале:
+   - для MySQL  
 
-# Запуск Авто-тестов
-Запуск авто-тестов производится командой ./gradlew test (./gradlew test -D selenide.headless=true для проведения в фоновом режиме).
+```
+java "-Dspring.datasource.url=jdbc:mysql://localhost:3306/app" -jar aqa-shop.jar
+
+```
+   - для PostgreSQL
+
+```
+java "-Dspring.datasource.url=jdbc:postgresql://localhost:5432/app" -jar aqa-shop.jar
+
+```
+# Запуск Авто-тестов в Терминале
+ - для MySQL
+ 
+ ```
+./gradlew clean test "-Ddb.url=jdbc:mysql://localhost:3306/app" -D selenide.headless=true
+
+```
+- для PostgreSQL
+
+```
+./gradlew clean test "-Ddb.url=jdbc:postgresql://localhost:5432/app" -D selenide.headless=true
+
+```
 
 # Получения отчёта Allure
-1. Выполнить команду gradlew allureReport
-2. Запустить авто-тесты ./gradlew test
-3. Для просмотра отчёта Allure необходимо выполнить команду gradlew AllureServe и дождаться открытия отчёта в браузере.
+1. Выполнить команду ./gradlew allureReport --clean
+2. Для просмотра отчёта Allure необходимо выполнить команду gradlew AllureServe и дождаться открытия отчёта в браузере.
