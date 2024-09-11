@@ -19,26 +19,22 @@
 
 ```
 java "-Dspring.datasource.url=jdbc:mysql://localhost:3306/app" -jar aqa-shop.jar
-
 ```
    - для PostgreSQL
 
 ```
 java "-Dspring.datasource.url=jdbc:postgresql://localhost:5432/app" -jar aqa-shop.jar
-
 ```
 # Запуск Авто-тестов в Терминале
  - для MySQL
  
  ```
 ./gradlew clean test "-Ddb.url=jdbc:mysql://localhost:3306/app" -D selenide.headless=true
-
 ```
 - для PostgreSQL
 
 ```
 ./gradlew clean test "-Ddb.url=jdbc:postgresql://localhost:5432/app" -D selenide.headless=true
-
 ```
 
 # Получения отчёта Allure
