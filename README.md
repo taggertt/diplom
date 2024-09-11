@@ -9,7 +9,7 @@
 1. Предустановленна Java: OpenJDK 11.
 2. Установить Docker и Docker-compose.
 3. Запустить в Docker контейнеры: MySQL, PostgreSQL, Node.Js.
-   `docker-compose up –d`
+   ```docker-compose up –d```
 5. Запустить Запустите jar-приложение (SUT), используя команду в терминале: "/artifacts java -jar aqa-shop.jar"
 
 # Запуск Авто-тестов
