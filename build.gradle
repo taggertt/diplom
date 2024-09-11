@@ -32,19 +32,10 @@
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
         testImplementation 'com.codeborne:selenide:6.19.1'
         testImplementation 'com.github.javafaker:javafaker:1.0.2'
-        testImplementation 'com.google.code.gson:gson:2.11.0'
         testImplementation 'mysql:mysql-connector-java:8.0.33'
-        testImplementation 'org.hamcrest:hamcrest-library:3.0'
         testImplementation 'commons-dbutils:commons-dbutils:1.8.1'
         testImplementation group: 'org.postgresql', name: 'postgresql', version: '42.2.14'
         testImplementation 'io.qameta.allure:allure-selenide:2.13.9'
-        testImplementation 'io.qameta.allure:allure-junit5:2.13.9'
-        testImplementation 'io.qameta.allure:allure-java-commons:2.13.9'
-        testImplementation 'org.aspectj:aspectjweaver:1.9.21'
-        testImplementation 'io.qameta.allure:allure-rest-assured:2.13.9'
-        testImplementation 'io.rest-assured:rest-assured:5.5.0'
-        testImplementation 'ch.qos.logback:logback-classic:1.5.7'
-        testImplementation 'org.assertj:assertj-core:3.24.2'
     }
 
     test {

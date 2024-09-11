@@ -16,8 +16,8 @@ public class TripPurchasePage {
     private SelenideElement paymentButton = $$("button[type='button'][role='button'] span.button__text").find(exactText("Купить"));
     private SelenideElement creditButton = $$("button[type='button'][role='button'] span.button__text").find(exactText("Купить в кредит"));
     private SelenideElement continueButton = $$("button[type='button'][role='button'] span.button__text").find(text("Продолжить"));
-    private SelenideElement paymentTitle = $$("#root>div>h3.heading.heading_size_m.heading_theme_alfa-on-white").find(exactText("Оплата по карте"));
-    private SelenideElement creditTitle = $$("#root>div>h3.heading.heading_size_m.heading_theme_alfa-on-white").find(exactText("Кредит по данным карты"));
+    private SelenideElement paymentTitle = $$("h3").find(exactText("Оплата по карте"));
+    private SelenideElement creditTitle = $$("h3").find(exactText("Кредит по данным карты"));
     private SelenideElement approvedNotification = $("div.notification.notification_status_ok .notification__content");
     private SelenideElement declinedNotification = $("div.notification.notification_status_error .notification__content");
 
@@ -41,7 +41,7 @@ public class TripPurchasePage {
         creditButton.shouldBe(visible);
         continueButton.shouldNotBe(visible);
 
-        ElementsCollection formElements = $$("#root>div>form.form.form_size_m.form_theme_alfa-on-white .input__inner>.input__top");
+        ElementsCollection formElements = $$(".input__inner>.input__top");
 
         cardNumberField = formElements.find(exactText("Номер карты")).parent().$(".input__box>input.input__control");
         cardNumberWarn = cardNumberField.parent().parent().$("span.input__sub");
@@ -144,15 +144,11 @@ public class TripPurchasePage {
         cvcWarn.shouldBe(visible);
     }
 
-    public void haveApprovedNotification (String expectedText) {
+    public void haveApprovedNotification(String expectedText) {
         approvedNotification.shouldHave(text(expectedText), Duration.ofSeconds(10)).shouldBe(visible);
     }
 
     public void haveDeclinedNotification(String expectedText) {
         declinedNotification.shouldHave(text(expectedText), Duration.ofSeconds(10)).shouldBe(visible);
-    }
-
-    public void noHaveApprovedNotification(String expectedText) {
-        approvedNotification.shouldNotHave(text(expectedText), Duration.ofSeconds(10)).shouldNotBe(visible);
     }
 }

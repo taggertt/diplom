@@ -1,7 +1,6 @@
 package ru.netology.test;
 
 import com.codeborne.selenide.logevents.SelenideLogger;
-//import io.qameta.allure.internal.shadowed.jackson.databind.jsonFormatVisitors.JsonFormatTypes;
 import io.qameta.allure.selenide.AllureSelenide;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -9,9 +8,7 @@ import org.junit.jupiter.api.Test;
 import ru.netology.data.*;
 import ru.netology.page.TripPurchasePage;
 
-//import static org.junit.jupiter.api.Assertions.*;
-import java.sql.SQLException;
-import org.assertj.core.api.SoftAssertions;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TripPurchaseTest {
 
@@ -31,83 +28,71 @@ public class TripPurchaseTest {
 
     //1 Тест для первичной оплаты по карте (approved)
     @Test
-    void successPaymentTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
+    void successPaymentTest() {
         OrderEntity lastOrder = DataHelper.getLastOrder();
         BankCard card = DataHelper.getApprovalCard_en();
         page.clickThePaymentButton();
         page.completeTheForm(card);
-        try {
-            page.haveApprovedNotification("Операция одобрена банком");
-        } catch (AssertionError e) {
-            softly.fail ("Ошибка вывода уведомления: " + e.getMessage());
-        }
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        PaymentEntity payment = DataHelper.getOrderPayment(newOrder);
-        softly.assertThat(lastOrder.getId()).isNotEqualTo(newOrder.getId());
-        softly.assertThat(approvedStatus).isEqualTo(payment.getStatus());
-        softly.assertThat(45000).isEqualTo(payment.getAmount());
-        softly.assertAll();
+        assertAll(
+                () -> page.haveApprovedNotification("Операция одобрена банком"),
+                () -> {
+                    OrderEntity newOrder = DataHelper.getLastOrder();
+                    PaymentEntity payment = DataHelper.getOrderPayment(newOrder);
+                    assertNotEquals(lastOrder.getId(), newOrder.getId());
+                    assertEquals(approvedStatus, payment.getStatus());
+                    assertEquals(45000, payment.getAmount());
+                });
     }
 
     //2 Тест для первичной оплаты в кредит (approved)
     @Test
-    void successCreditTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
+    void successCreditTest() {
         OrderEntity lastOrder = DataHelper.getLastOrder();
         BankCard card = DataHelper.getApprovalCard_en();
         page.clickTheCreditButton();
         page.completeTheForm(card);
-        try {
-            page.haveApprovedNotification("Операция одобрена банком");
-        } catch (AssertionError e) {
-            softly.fail("Ошибка вывода уведомления: " + e.getMessage());
-        }
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        CreditRequestEntity credit = DataHelper.getOrderCreditRegistry(newOrder);
-        softly.assertThat(lastOrder.getId()).isNotEqualTo(newOrder.getId());
-        softly.assertThat(approvedStatus).isEqualTo(credit.getStatus());
-        softly.assertAll();
+        assertAll(
+                () -> page.haveApprovedNotification("Операция одобрена банком"),
+                () -> {
+                    OrderEntity newOrder = DataHelper.getLastOrder();
+                    CreditRequestEntity credit = DataHelper.getOrderCreditRegistry(newOrder);
+                    assertNotEquals(lastOrder.getId(), newOrder.getId());
+                    assertEquals(approvedStatus, credit.getStatus());
+                });
     }
 
     //3 Тест для оплаты по карте со статусом "declined"
     @Test
-    void declinedPaymentTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
+    void declinedPaymentTest() {
         OrderEntity lastOrder = DataHelper.getLastOrder();
-        BankCard card = DataHelper.getNotApprovalCard_en();
+        BankCard card = DataHelper.getDeclinedCard_en();
         page.clickThePaymentButton();
         page.completeTheForm(card);
-        try {
-            page.haveDeclinedNotification("Банк отказал в проведении операции");
-        } catch (AssertionError e) {
-            softly.fail ("Ошибка вывода уведомления: " + e.getMessage());
-        }
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        PaymentEntity payment = DataHelper.getOrderPayment(newOrder);
-        softly.assertThat(lastOrder.getId()).isNotEqualTo(newOrder.getId());
-        softly.assertThat(declinedStatus).isEqualTo(payment.getStatus());
-        softly.assertAll();
+        assertAll (
+                () -> page.haveDeclinedNotification("Банк отказал в проведении операции"),
+                () -> {
+                    OrderEntity newOrder = DataHelper.getLastOrder();
+                    PaymentEntity payment = DataHelper.getOrderPayment(newOrder);
+                    assertNotEquals(lastOrder.getId(), newOrder.getId());
+                    assertEquals(declinedStatus, payment.getStatus());
+                });
     }
 
     //4 Тест для оплаты в кредит со статусом "declined"
     @Test
-    void declinedCardCreditRequestTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
+    void declinedCardCreditRequestTest() {
         OrderEntity lastOrder = DataHelper.getLastOrder();
-        BankCard card = DataHelper.getNotApprovalCard_en();
+        BankCard card = DataHelper.getDeclinedCard_en();
         page.clickTheCreditButton();
         page.completeTheForm(card);
-        try {
-            page.haveDeclinedNotification("Банк отказал в проведении операции");
-        } catch (AssertionError e) {
-            softly.fail ("Ошибка вывода уведомления: " + e.getMessage());
-        }
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        CreditRequestEntity credit = DataHelper.getOrderCreditRegistry(newOrder);
-        softly.assertThat(lastOrder.getId()).isNotEqualTo(newOrder.getId());
-        softly.assertThat(declinedStatus).isEqualTo(credit.getStatus());
-        softly.assertAll();
+        assertAll (
+                () -> page.haveDeclinedNotification("Банк отказал в проведении операции"),
+                () -> {
+                    OrderEntity newOrder = DataHelper.getLastOrder();
+                    CreditRequestEntity credit = DataHelper.getOrderCreditRegistry(newOrder);
+                    assertNotEquals(lastOrder.getId(), newOrder.getId());
+                    assertEquals(declinedStatus, credit.getStatus());
+                });
     }
 
     //5 Тест ввод пустых полей с оплатой по карте
@@ -130,636 +115,391 @@ public class TripPurchaseTest {
 
     //7 Тест с пустой картой при оплате по карте
     @Test
-    void notCardNumberPaymentTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
+    void notCardNumberPaymentTest() {
         OrderEntity lastOrder = DataHelper.getLastOrder();
-        BankCard card = DataHelper.getAnEmptyNumberCard_en();
+        BankCard card = DataHelper.getEmptyCardNUmberBankCard();
         page.clickThePaymentButton();
         page.completeTheForm(card);
-        try {
-            page.noHaveApprovedNotification("Операция одобрена банком");
-        } catch (AssertionError e) {
-            softly.fail("Ошибка вывода уведомления " + e.getMessage());
-        }
-        try {
-            page.warningAboutAnInvalidCardNumber("Поле обязательно для заполнения");
-        } catch (AssertionError e) {
-            softly.fail("Ошибка вывода подсказки " + e.getMessage());
-        }
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        softly.assertThat(lastOrder.getId()).isEqualTo(newOrder.getId());
-        softly.assertAll();
+        assertAll(
+                () -> page.warningAboutAnInvalidCardNumber("Поле обязательно для заполнения"),
+                () -> {
+                    OrderEntity newOrder = DataHelper.getLastOrder();
+                    assertEquals(lastOrder.getId(), newOrder.getId());
+                });
     }
 
     //8 Тест с пустой картой при оплате в кредит
     @Test
-    void notCardNumberCreditRequestTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
+    void notCardNumberCreditRequestTest() {
         OrderEntity lastOrder = DataHelper.getLastOrder();
-        BankCard card = DataHelper.getAnEmptyNumberCard_en();
+        BankCard card = DataHelper.getEmptyCardNUmberBankCard();
         page.clickTheCreditButton();
         page.completeTheForm(card);
-        try {
-            page.noHaveApprovedNotification("Операция одобрена банком");
-        } catch (AssertionError e) {
-            softly.fail("Ошибка вывода уведомления " + e.getMessage());
-        }
-        try {
-            page.warningAboutAnInvalidCardNumber("Поле обязательно для заполнения");
-        } catch (AssertionError e) {
-            softly.fail("Ошибка вывода подсказки " + e.getMessage());
-        }
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        softly.assertThat(newOrder.getId()).isEqualTo(lastOrder.getId());
-        softly.assertAll();
+        assertAll(
+                () -> page.warningAboutAnInvalidCardNumber("Поле обязательно для заполнения"),
+                () -> {
+                    OrderEntity newOrder = DataHelper.getLastOrder();
+                    assertEquals(newOrder.getId(), lastOrder.getId());
+                });
     }
 
     //9 Тест с пустым номером месяца при оплате по карте
     @Test
-    void notMonthPaymentTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
+    void notMonthPaymentTest() {
         OrderEntity lastOrder = DataHelper.getLastOrder();
-        BankCard card = DataHelper.GettingAnEmptyCard();
+        BankCard card = DataHelper.getEmptyMonthBankCard();
         page.clickThePaymentButton();
         page.completeTheForm(card);
-        try {
-            page.noHaveApprovedNotification("Операция одобрена банком");
-        } catch (AssertionError e) {
-            softly.fail ("Ошибка вывода уведомления " + e.getMessage());
-        }
-        try {
-            page.warningAboutAnInvalidMonth("Поле обязательно для заполнения");
-        } catch (AssertionError e) {
-            softly.fail ("Ошибка вывода подсказки " + e.getMessage());
-        }
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        softly.assertThat(lastOrder.getId()).isEqualTo(newOrder.getId());
-        softly.assertAll();
+        assertAll (
+                () -> page.warningAboutAnInvalidMonth("Поле обязательно для заполнения"),
+                () -> {
+                    OrderEntity newOrder = DataHelper.getLastOrder();
+                    assertEquals(lastOrder.getId(), newOrder.getId());
+                });
     }
 
     //10 Тест с пустым номером месяца при оплате в кредит
     @Test
-    void notMonthCreditTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
+    void notMonthCreditTest() {
         OrderEntity lastOrder = DataHelper.getLastOrder();
-        BankCard card = DataHelper.GettingAnEmptyCard();
+        BankCard card = DataHelper.getEmptyMonthBankCard();
         page.clickTheCreditButton();
         page.completeTheForm(card);
-        try {
-            page.noHaveApprovedNotification("Операция одобрена банком");
-        } catch (AssertionError e) {
-            softly.fail ("Ошибка вывода уведомления " + e.getMessage());
-        }
-        try {
-            page.warningAboutAnInvalidMonth("Поле обязательно для заполнения");
-        } catch (AssertionError e) {
-            softly.fail("Ошибка вывода подсказки" + e.getMessage());
-        }
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        softly.assertThat(lastOrder.getId()).isEqualTo(newOrder.getId());
-        softly.assertAll();
+        assertAll (
+                () -> page.warningAboutAnInvalidMonth("Поле обязательно для заполнения"),
+                () -> {
+                    OrderEntity newOrder = DataHelper.getLastOrder();
+                    assertEquals(lastOrder.getId(), newOrder.getId());
+                });
     }
 
     //11 Тест с вводом 13 в поле месяц при оплате по карте
     @Test
-    void invalidMonth13PaymentTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
+    void invalidMonth13PaymentTest() {
         OrderEntity lastOrder = DataHelper.getLastOrder();
-        BankCard card = DataHelper.getAnInvalidCardMonth13();
+        BankCard card = DataHelper.getNotValidMonth13BankCard();
         page.clickThePaymentButton();
         page.completeTheForm(card);
-        try {
-            page.noHaveApprovedNotification("Операция одобрена банком");
-        } catch (AssertionError e) {
-            softly.fail( "Ошибка вывода уведомления " + e.getMessage());
-        }
-        try {
-            page.warningAboutAnInvalidMonth("неверный формат");
-        } catch (AssertionError e) {
-            softly.fail ("Ошибка вывода подсказки " + e.getMessage());
-        }
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        softly.assertThat(lastOrder.getId()).isEqualTo(newOrder.getId());
-        softly.assertAll();
+        assertAll (
+                () -> page.warningAboutAnInvalidMonth("неверный формат"),
+                () -> {
+                    OrderEntity newOrder = DataHelper.getLastOrder();
+                    assertEquals(lastOrder.getId(), newOrder.getId());
+                });
     }
 
     //12 Тест с вводом 13 в поле месяц при оплате в кредит
     @Test
-    void invalidMonth13CreditTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
+    void invalidMonth13CreditTest() {
         OrderEntity lastOrder = DataHelper.getLastOrder();
-        BankCard card = DataHelper.getAnInvalidCardMonth13();
+        BankCard card = DataHelper.getNotValidMonth13BankCard();
         page.clickTheCreditButton();
         page.completeTheForm(card);
-        try {
-            page.noHaveApprovedNotification("Операция одобрена банком");
-        } catch (AssertionError e) {
-            softly.fail( "Ошибка вывода уведомления " + e.getMessage());
-        }
-        try {
-            page.warningAboutAnInvalidMonth("неверный формат");
-        } catch (AssertionError e) {
-            softly.fail ("Ошибка вывода подсказки " + e.getMessage());
-        }
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        softly.assertThat(lastOrder.getId()).isEqualTo(newOrder.getId());
-        softly.assertAll();
+        assertAll (
+                () -> page.warningAboutAnInvalidMonth("неверный формат"),
+                () -> {
+                    OrderEntity newOrder = DataHelper.getLastOrder();
+                    assertEquals(lastOrder.getId(), newOrder.getId());
+                });
     }
 
     //13 Тест с неверным месяцем по дате при оплате по карте
     @Test
-    void invalidMonthPaymentTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
+    void invalidMonthPaymentTest() {
         OrderEntity lastOrder = DataHelper.getLastOrder();
-        BankCard card = DataHelper.getAnInvalidCardFormat();
+        BankCard card = DataHelper.getNotValidMonthBankCard();
         page.clickThePaymentButton();
         page.completeTheForm(card);
-        try {
-            page.noHaveApprovedNotification("Операция одобрена банком");
-        } catch (AssertionError e) {
-            softly.fail("Ошибка вывода уведомления " + e.getMessage());
-        }
-        try {
-            page.warningAboutAnInvalidMonth("Неверно указан срок действия карты");
-        } catch (AssertionError e) {
-            softly.fail("Ошибка вывода подсказки");
-        }
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        softly.assertThat(lastOrder.getId()).isEqualTo(newOrder.getId());
-        softly.assertAll();
+        assertAll (
+                () -> page.warningAboutAnInvalidMonth("Неверно указан срок действия карты"),
+                () -> {
+                    OrderEntity newOrder = DataHelper.getLastOrder();
+                    assertEquals(lastOrder.getId(), newOrder.getId());
+                });
     }
 
     //14 Тест с неверным месяцем по дате при оплате в кредит
     @Test
-    void invalidMonthCreditTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
+    void invalidMonthCreditTest() {
         OrderEntity lastOrder = DataHelper.getLastOrder();
-        BankCard card = DataHelper.getAnInvalidCardFormat();
+        BankCard card = DataHelper.getNotValidMonthBankCard();
         page.clickTheCreditButton();
         page.completeTheForm(card);
-        try {
-            page.noHaveApprovedNotification("Операция одобрена банком");
-        } catch (AssertionError e) {
-            softly.fail("Ошибка вывода уведомления " + e.getMessage());
-        }
-        try {
-            page.warningAboutAnInvalidMonth("Неверно указан срок действия карты");
-        } catch (AssertionError e) {
-            softly.fail("Ошибка вывода подсказки");
-        }
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        softly.assertThat(lastOrder.getId()).isEqualTo(newOrder.getId());
-        softly.assertAll();
+        assertAll (
+                () -> page.warningAboutAnInvalidMonth("Неверно указан срок действия карты"),
+                () -> {
+                    OrderEntity newOrder = DataHelper.getLastOrder();
+                    assertEquals(lastOrder.getId(), newOrder.getId());
+                });
     }
 
     //15 Тест с пустым полем год при оплате по карте
     @Test
-    void notYearPaymentTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
+    void notYearPaymentTest() {
         OrderEntity lastOrder = DataHelper.getLastOrder();
-        BankCard card = DataHelper.gettingAnEmptyYear();
+        BankCard card = DataHelper.getEmptyYearBankCard();
         page.clickThePaymentButton();
         page.completeTheForm(card);
-        try {
-            page.noHaveApprovedNotification("Операция одобрена банком");
-        } catch (AssertionError e) {
-            softly.fail ("Ошибка вывода уведомления " + e.getMessage());
-        }
-        try {
-            page.warningAboutAnInvalidYear("Поле обязательно для заполнения");
-        } catch (AssertionError e) {
-            softly.fail ("Ошибка вывода подсказки " + e.getMessage());
-        }
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        softly.assertThat(lastOrder.getId()).isEqualTo(newOrder.getId());
-        softly.assertAll();
+        assertAll (
+                () -> page.warningAboutAnInvalidYear("Поле обязательно для заполнения"),
+                () -> {
+                    OrderEntity newOrder = DataHelper.getLastOrder();
+                    assertEquals(lastOrder.getId(), newOrder.getId());
+                });
     }
 
     //16 Тест с пустым полем год при оплате в кредит
     @Test
-    void notYearCreditTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
+    void notYearCreditTest() {
         OrderEntity lastOrder = DataHelper.getLastOrder();
-        BankCard card = DataHelper.gettingAnEmptyYear();
+        BankCard card = DataHelper.getEmptyYearBankCard();
         page.clickTheCreditButton();
         page.completeTheForm(card);
-        try {
-            page.noHaveApprovedNotification("Операция одобрена банком");
-        } catch (AssertionError e) {
-            softly.fail ("Ошибка вывода уведомления " + e.getMessage());
-        }
-        try {
-            page.warningAboutAnInvalidYear("Поле обязательно для заполнения");
-        } catch (AssertionError e) {
-            softly.fail ("Ошибка вывода подсказки " + e.getMessage());
-        }
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        softly.assertThat(lastOrder.getId()).isEqualTo(newOrder.getId());
-        softly.assertAll();
+        assertAll(
+                () -> page.warningAboutAnInvalidYear("Поле обязательно для заполнения"),
+                () -> {
+                    OrderEntity newOrder = DataHelper.getLastOrder();
+                    assertEquals(lastOrder.getId(), newOrder.getId());
+                });
     }
 
     //17 Тест с пустым полем Владелец при оплате по карте
     @Test
-    void notHolderPaymentTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
+    void notHolderPaymentTest() {
         OrderEntity lastOrder = DataHelper.getLastOrder();
-        BankCard card = DataHelper.gettingAnEmptyHalfCardHolder();
+        BankCard card = DataHelper.getEmptyHolderBankCard();
         page.clickThePaymentButton();
         page.completeTheForm(card);
-        try {
-            page.noHaveApprovedNotification("Операция одобрена банком");
-        } catch (AssertionError e) {
-            softly.fail ("Ошибка вывода уведомления " + e.getMessage());
-        }
-        try {
-            page.warningAboutAnInvalidHolder("Поле обязательно для заполнения");
-        } catch (AssertionError e) {
-            softly.fail("Ошибка вывода подсказки " + e.getMessage());
-        }
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        softly.assertThat(lastOrder.getId()).isEqualTo(newOrder.getId());
-        softly.assertAll();
+        assertAll (
+                () -> page.warningAboutAnInvalidHolder("Поле обязательно для заполнения"),
+                () -> {
+                    OrderEntity newOrder = DataHelper.getLastOrder();
+                    assertEquals(lastOrder.getId(), newOrder.getId());
+                });
     }
 
     //18 Тест с пустым полем Владелец при оплате в кредит
     @Test
-    void notHolderCreditTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
+    void notHolderCreditTest() {
         OrderEntity lastOrder = DataHelper.getLastOrder();
-        BankCard card = DataHelper.gettingAnEmptyHalfCardHolder();
+        BankCard card = DataHelper.getEmptyHolderBankCard();
         page.clickTheCreditButton();
         page.completeTheForm(card);
-        try {
-            page.noHaveApprovedNotification("Операция одобрена банком");
-        } catch (AssertionError e) {
-            softly.fail ("Ошибка вывода уведомления " + e.getMessage());
-        }
-        try {
-            page.warningAboutAnInvalidHolder("Поле обязательно для заполнения");
-        } catch (AssertionError e) {
-            softly.fail("Ошибка вывода подсказки " + e.getMessage());
-        }
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        softly.assertThat(lastOrder.getId()).isEqualTo(newOrder.getId());
-        softly.assertAll();
+        assertAll (
+                () -> page.warningAboutAnInvalidHolder("Поле обязательно для заполнения"),
+                () -> {
+                    OrderEntity newOrder = DataHelper.getLastOrder();
+                    assertEquals(lastOrder.getId(), newOrder.getId());
+                });
     }
 
     //19 Тест с пустым полем cvc/cvv при оплате по карте
     @Test
-    void notCvcPaymentTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
+    void notCvcPaymentTest() {
         OrderEntity lastOrder = DataHelper.getLastOrder();
-        BankCard card = DataHelper.gettingAnEmptyCvcCode();
+        BankCard card = DataHelper.getEmptyCvcBankCard();
         page.clickThePaymentButton();
         page.completeTheForm(card);
-        try {
-            page.noHaveApprovedNotification("Операция одобрена банком");
-        } catch (AssertionError e) {
-            softly.fail ("Ошибка вывода уведомления " + e.getMessage());
-        }
-        try {
-            page.warningAboutAnInvalidCvc("Поле обязательно для заполнения");
-        } catch (AssertionError e) {
-            softly.fail ("ОШибка вывода подсказки " + e.getMessage());
-        }
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        softly.assertThat(lastOrder.getId()).isEqualTo(newOrder.getId());
-        softly.assertAll();
+        assertAll (
+                () ->  page.warningAboutAnInvalidCvc("Поле обязательно для заполнения"),
+                () -> {
+                    OrderEntity newOrder = DataHelper.getLastOrder();
+                    assertEquals(lastOrder.getId(), newOrder.getId());
+                });
     }
 
     //20 Тест с пустым полем cvc/cvv при оплате в кредит
     @Test
-    void notCvcCreditTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
+    void notCvcCreditTest() {
         OrderEntity lastOrder = DataHelper.getLastOrder();
-        BankCard card = DataHelper.gettingAnEmptyCvcCode();
+        BankCard card = DataHelper.getEmptyCvcBankCard();
         page.clickTheCreditButton();
         page.completeTheForm(card);
-        try {
-            page.noHaveApprovedNotification("Операция одобрена банком");
-        } catch (AssertionError e) {
-            softly.fail ("Ошибка вывода уведомления " + e.getMessage());
-        }
-        try {
-            page.warningAboutAnInvalidCvc("Поле обязательно для заполнения");
-        } catch (AssertionError e) {
-            softly.fail ("ОШибка вывода подсказки " + e.getMessage());
-        }
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        softly.assertThat(lastOrder.getId()).isEqualTo(newOrder.getId());
-        softly.assertAll();
+        assertAll (
+                () -> page.warningAboutAnInvalidCvc("Поле обязательно для заполнения"),
+                () -> {
+                    OrderEntity newOrder = DataHelper.getLastOrder();
+                    assertEquals(lastOrder.getId(), newOrder.getId());
+                });
     }
 
     //21 Тест с пустым полем год на 6 больше текущего при оплате по карте
     @Test
-    void invalidYear6PaymentTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
+    void invalidYear6PaymentTest() {
         OrderEntity lastOrder = DataHelper.getLastOrder();
-        BankCard card = DataHelper.gettingTheWrongYear6();
+        BankCard card = DataHelper.getInvalidYear6BankCard();
         page.clickThePaymentButton();
         page.completeTheForm(card);
-        try {
-            page.noHaveApprovedNotification("Операция одобрена банком");
-        } catch (AssertionError e) {
-            softly.fail ("Ошибка вывода уведомления " + e.getMessage());
-        }
-        try {
-            page.warningAboutAnInvalidYear("Неверно указан срок действия карты");
-        } catch (AssertionError e) {
-            softly.fail("Ошибка вывода подсказки " + e.getMessage());
-        }
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        softly.assertThat(lastOrder.getId()).isEqualTo(newOrder.getId());
-        softly.assertAll();
+        assertAll (
+                () -> page.warningAboutAnInvalidYear("Неверно указан срок действия карты"),
+                () -> {
+                    OrderEntity newOrder = DataHelper.getLastOrder();
+                    assertEquals(lastOrder.getId(), newOrder.getId());
+                });
     }
 
     //22 Тест с пустым полем год на 6 больше текущего при оплате в кредит
     @Test
-    void invalidYear6CreditTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
+    void invalidYear6CreditTest() {
         OrderEntity lastOrder = DataHelper.getLastOrder();
-        BankCard card = DataHelper.gettingTheWrongYear6();
+        BankCard card = DataHelper.getInvalidYear6BankCard();
         page.clickTheCreditButton();
         page.completeTheForm(card);
-        try {
-            page.noHaveApprovedNotification("Операция одобрена банком");
-        } catch (AssertionError e) {
-            softly.fail ("Ошибка вывода уведомления " + e.getMessage());
-        }
-        try {
-            page.warningAboutAnInvalidYear("Неверно указан срок действия карты");
-        } catch (AssertionError e) {
-            softly.fail("Ошибка вывода подсказки " + e.getMessage());
-        }
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        softly.assertThat(lastOrder.getId()).isEqualTo(newOrder.getId());
-        softly.assertAll();
+        assertAll (
+                () -> page.warningAboutAnInvalidYear("Неверно указан срок действия карты"),
+                () -> {
+                    OrderEntity newOrder = DataHelper.getLastOrder();
+                    assertEquals(lastOrder.getId(), newOrder.getId());
+                });
     }
 
     //23 Тест с истекшим годом при оплате по карте
     @Test
-    void invalidYearPaymentTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
+    void invalidYearPaymentTest() {
         OrderEntity lastOrder = DataHelper.getLastOrder();
-        BankCard card = DataHelper.gettingTheWrongYear();
+        BankCard card = DataHelper.getInvalidYearBankCard();
         page.clickThePaymentButton();
         page.completeTheForm(card);
-        try {
-            page.noHaveApprovedNotification("Операция одобрена банком");
-        } catch (AssertionError e) {
-            softly.fail ("Ошибка вывода уведомления " + e.getMessage());
-        }
-        try {
-            page.warningAboutAnInvalidYear("Истёк срок действия карты");
-        } catch (AssertionError e) {
-            softly.fail("Ошибка вывода подсказки");
-        }
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        softly.assertThat(lastOrder.getId()).isEqualTo(newOrder.getId());
-        softly.assertAll();
+        assertAll (
+                () -> page.warningAboutAnInvalidYear("Истёк срок действия карты"),
+                () -> {
+                    OrderEntity newOrder = DataHelper.getLastOrder();
+                    assertEquals(lastOrder.getId(), newOrder.getId());
+                });
     }
 
     //24 Тест с истекшим годом при оплате в кредит
     @Test
-    void invalidYearCreditTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
+    void invalidYearCreditTest() {
         OrderEntity lastOrder = DataHelper.getLastOrder();
-        BankCard card = DataHelper.gettingTheWrongYear();
+        BankCard card = DataHelper.getInvalidYearBankCard();
         page.clickTheCreditButton();
         page.completeTheForm(card);
-        try {
-            page.noHaveApprovedNotification("Операция одобрена банком");
-        } catch (AssertionError e) {
-            softly.fail ("Ошибка вывода уведомления " + e.getMessage());
-        }
-        try {
-            page.warningAboutAnInvalidYear("Истёк срок действия карты");
-        } catch (AssertionError e) {
-            softly.fail("Ошибка вывода подсказки");
-        }
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        softly.assertThat(lastOrder.getId()).isEqualTo(newOrder.getId());
-        softly.assertAll();
+        assertAll (
+                () -> page.warningAboutAnInvalidYear("Истёк срок действия карты"),
+                () -> {
+                    OrderEntity newOrder = DataHelper.getLastOrder();
+                    assertEquals(lastOrder.getId(), newOrder.getId());
+                });
     }
 
     //25 Тест с полем Владелец заполненным кириллицей для оплаты по карте
     @Test
-    void invalidHolderCyrillicPaymentTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
+    void invalidHolderCyrillicPaymentTest() {
         OrderEntity lastOrder = DataHelper.getLastOrder();
         BankCard card = DataHelper.getApprovalCard_ru();
         page.clickThePaymentButton();
         page.completeTheForm(card);
-        try {
-            page.noHaveApprovedNotification("Операция одобрена банком");
-        } catch (AssertionError e) {
-            softly.fail ("Ошибка вывода уведомления " + e.getMessage());
-        }
-        try {
-            page.warningAboutAnInvalidHolder("неверный формат");
-        } catch (AssertionError e) {
-            softly.fail("Ошибка вывода подсказки " + e.getMessage());
-        }
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        softly.assertThat(lastOrder.getId()).isEqualTo(newOrder.getId());
-        softly.assertAll();
+        assertAll (
+                () -> page.warningAboutAnInvalidHolder("неверный формат"),
+                () -> {
+                    OrderEntity newOrder = DataHelper.getLastOrder();
+                    assertEquals(lastOrder.getId(), newOrder.getId());
+                });
     }
 
     //26 Тест с полем Владелец заполненным кириллицей для оплаты в кредит
     @Test
-    void invalidHolderCyrillicCreditTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
+    void invalidHolderCyrillicCreditTest() {
         OrderEntity lastOrder = DataHelper.getLastOrder();
         BankCard card = DataHelper.getApprovalCard_ru();
         page.clickTheCreditButton();
         page.completeTheForm(card);
-        try {
-            page.noHaveApprovedNotification("Операция одобрена банком");
-        } catch (AssertionError e) {
-            softly.fail ("Ошибка вывода уведомления " + e.getMessage());
-        }
-        try {
-            page.warningAboutAnInvalidHolder("неверный формат");
-        } catch (AssertionError e) {
-            softly.fail("Ошибка вывода подсказки " + e.getMessage());
-        }
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        softly.assertThat(lastOrder.getId()).isEqualTo(newOrder.getId());
-        softly.assertAll();
+        assertAll (
+                () -> page.warningAboutAnInvalidHolder("неверный формат"),
+                () -> {
+                    OrderEntity newOrder = DataHelper.getLastOrder();
+                    assertEquals(lastOrder.getId(), newOrder.getId());
+                });
     }
 
     //27 Тест с полем Владелец заполненным спец символами для оплаты по карте
     @Test
-    void invalidHolderSpecPaymentTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
+    void invalidHolderSpecPaymentTest() {
         OrderEntity lastOrder = DataHelper.getLastOrder();
-        BankCard card = DataHelper.gettingSpecialCharacters();
+        BankCard card = DataHelper.getSpecCharBankCard();
         page.clickTheCreditButton();
         page.completeTheForm(card);
-        try {
-            page.noHaveApprovedNotification("Операция одобрена банком");
-        } catch (AssertionError e) {
-            softly.fail ("Ошибка вывода уведомления " + e.getMessage());
-        }
-        try {
-            page.warningAboutAnInvalidHolder("неверный формат");
-        } catch (AssertionError e) {
-            softly.fail ("Ошибка вывода подсказки " + e.getMessage());
-        }
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        softly.assertThat(lastOrder.getId()).isEqualTo(newOrder.getId());
-        softly.assertAll();
+        assertAll (
+                () -> page.warningAboutAnInvalidHolder("неверный формат"),
+                () -> {
+                    OrderEntity newOrder = DataHelper.getLastOrder();
+                    assertEquals(lastOrder.getId(), newOrder.getId());
+                });
     }
 
     //28 Тест с полем Владелец заполненным спец символами для оплаты в кредит
     @Test
-    void invalidHolderSpecCreditTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
+    void invalidHolderSpecCreditTest() {
         OrderEntity lastOrder = DataHelper.getLastOrder();
-        BankCard card = DataHelper.gettingSpecialCharacters();
+        BankCard card = DataHelper.getSpecCharBankCard();
         page.clickTheCreditButton();
         page.completeTheForm(card);
-        try {
-            page.noHaveApprovedNotification("Операция одобрена банком");
-        } catch (AssertionError e) {
-            softly.fail ("Ошибка вывода уведомления " + e.getMessage());
-        }
-        try {
-            page.warningAboutAnInvalidHolder("неверный формат");
-        } catch (AssertionError e) {
-            softly.fail ("Ошибка вывода подсказки " + e.getMessage());
-        }
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        softly.assertThat(lastOrder.getId()).isEqualTo(newOrder.getId());
-        softly.assertAll();
+        assertAll (
+                () -> page.warningAboutAnInvalidHolder("неверный формат"),
+                () -> {
+                    OrderEntity newOrder = DataHelper.getLastOrder();
+                    assertEquals(lastOrder.getId(), newOrder.getId());
+                });
     }
 
     //29 Тест с вводом в поле номер карты несуществующего номера при оплате картой
     @Test
-    void notExistCardPaymentTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
+    void notExistCardPaymentTest() {
         OrderEntity lastOrder = DataHelper.getLastOrder();
-        BankCard card = DataHelper.getANonExistentNumberCard_en();
+        BankCard card = DataHelper.getInvalidCard_en();
         page.clickThePaymentButton();
         page.completeTheForm(card);
-        try {
-            page.haveDeclinedNotification("Банк отказал в проведении операции");
-        } catch (AssertionError e) {
-            softly.fail("Ошибка вывода уведомления " + e.getMessage());
-        }
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        softly.assertThat(lastOrder.getId()).isEqualTo(newOrder.getId());
-        softly.assertAll();
+        assertAll(
+                () -> page.haveDeclinedNotification("Банк отказал в проведении операции"),
+                () -> {
+                    OrderEntity newOrder = DataHelper.getLastOrder();
+                    assertEquals(lastOrder.getId(), newOrder.getId());
+                });
     }
 
     //30 Тест с вводом в поле номер карты несуществующего номера при оплате по кредиту
     @Test
-    void notExistCardCreditTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
+    void notExistCardCreditTest() {
         OrderEntity lastOrder = DataHelper.getLastOrder();
-        BankCard card = DataHelper.getANonExistentNumberCard_en();
+        BankCard card = DataHelper.getInvalidCard_en();
         page.clickTheCreditButton();
         page.completeTheForm(card);
-        try {
-            page.haveDeclinedNotification("Банк отказал в проведении операции");
-        } catch (AssertionError e) {
-            softly.fail("Ошибка вывода уведомления " + e.getMessage());
-        }
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        softly.assertThat(lastOrder.getId()).isEqualTo(newOrder.getId());
-        softly.assertAll();
+        assertAll (
+                () -> page.haveDeclinedNotification("Банк отказал в проведении операции"),
+                () -> {
+                    OrderEntity newOrder = DataHelper.getLastOrder();
+                    assertEquals(lastOrder.getId(), newOrder.getId());
+                });
     }
 
-    //31 Тест с не полным номером карты для оплаты картой
+    //31 Тест с вводом в поле cvc/cvv двузначного числа при оплате картой
     @Test
-    void invalidCardNumberPaymentTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
+    void invalidCvcPaymentTest() {
         OrderEntity lastOrder = DataHelper.getLastOrder();
-        BankCard card = DataHelper.getInvalidNumberCard_en();
+        BankCard card = DataHelper.getInvalidCvcBankCard();
         page.clickThePaymentButton();
         page.completeTheForm(card);
-        try {
-            page.noHaveApprovedNotification("Операция одобрена банком");
-        } catch (AssertionError e) {
-            softly.fail ("Ошибка вывода уведомления " + e.getMessage());
-        }
-        try {
-            page.warningAboutAnInvalidCardNumber("неверный формат");
-        } catch (AssertionError e) {
-            softly.fail("Ошибка вывода подсказки " + e.getMessage());
-        }
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        softly.assertThat(lastOrder.getId()).isEqualTo(newOrder.getId());
-        softly.assertAll();
+        assertAll(
+                () -> page.warningAboutAnInvalidCvc("неверный формат"),
+                () -> {
+                    OrderEntity newOrder = DataHelper.getLastOrder();
+                    assertEquals(lastOrder.getId(), newOrder.getId());
+                });
     }
 
-    //32 Тест с не полным номером карты для оплаты в кредит
+    //32 Тест с вводом в поле cvc/cvv двузначного числа при оплате по кредиту
     @Test
-    void invalidCardNumberCreditRequestTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
+    void invalidCvcCreditTest() {
         OrderEntity lastOrder = DataHelper.getLastOrder();
-        BankCard card = DataHelper.getInvalidNumberCard_en();
-        page.clickThePaymentButton();
-        page.completeTheForm(card);
-        try {
-            page.noHaveApprovedNotification("Операция одобрена банком");
-        } catch (AssertionError e) {
-            softly.fail ("Ошибка вывода уведомления " + e.getMessage());
-        }
-        try {
-            page.warningAboutAnInvalidCardNumber("неверный формат");
-        } catch (AssertionError e) {
-            softly.fail("Ошибка вывода подсказки " + e.getMessage());
-        }
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        softly.assertThat(lastOrder.getId()).isEqualTo(newOrder.getId());
-        softly.assertAll();
-    }
-
-    //33 Тест с вводом в поле cvc/cvv двузначного числа при оплате картой
-    @Test
-    void invalidCvcPaymentTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
-        OrderEntity lastOrder = DataHelper.getLastOrder();
-        BankCard card = DataHelper.GettingInvalidCvcCode();
-        page.clickThePaymentButton();
-        page.completeTheForm(card);
-        try {
-            page.noHaveApprovedNotification("Операция одобрена банком");
-        } catch (AssertionError e) {
-            softly.fail ("Ошибка вывода уведомления " + e.getMessage());
-        }
-        try {
-            page.warningAboutAnInvalidCvc("неверный формат");
-        } catch (AssertionError e) {
-            softly.fail("Ошибка вывода подсказки " + e.getMessage());
-        }
-        page.warningAboutAnInvalidCvc("неверный формат");
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        softly.assertThat(lastOrder.getId()).isEqualTo(newOrder.getId());
-        softly.assertAll();
-    }
-
-    //34 Тест с вводом в поле cvc/cvv двузначного числа при оплате по кредиту
-    @Test
-    void invalidCvcCreditTest() throws SQLException {
-        SoftAssertions softly = new SoftAssertions();
-        OrderEntity lastOrder = DataHelper.getLastOrder();
-        BankCard card = DataHelper.GettingInvalidCvcCode();
+        BankCard card = DataHelper.getInvalidCvcBankCard();
         page.clickTheCreditButton();
         page.completeTheForm(card);
-        try {
-            page.noHaveApprovedNotification("Операция одобрена банком");
-        } catch (AssertionError e) {
-            softly.fail ("Ошибка вывода уведомления " + e.getMessage());
-        }
-        try {
-            page.warningAboutAnInvalidCvc("неверный формат");
-        } catch (AssertionError e) {
-            softly.fail("Ошибка вывода подсказки " + e.getMessage());
-        }
-        OrderEntity newOrder = DataHelper.getLastOrder();
-        softly.assertThat(lastOrder.getId()).isEqualTo(newOrder.getId());
-        softly.assertAll();
+        assertAll (
+                () -> page.warningAboutAnInvalidCvc("неверный формат"),
+                () -> {
+                    OrderEntity newOrder = DataHelper.getLastOrder();
+                    assertEquals(lastOrder.getId(), newOrder.getId());
+                });
     }
 }

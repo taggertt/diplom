@@ -1,12 +1,8 @@
 package ru.netology.data;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Value;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Value
 public class BankCard {
     private String cardNumber;
     private String expireMonth;

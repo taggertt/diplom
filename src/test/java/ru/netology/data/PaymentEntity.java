@@ -1,9 +1,9 @@
 package ru.netology.data;
 
+import java.sql.Timestamp;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.sql.Timestamp;
 
 @Data
 @NoArgsConstructor
@@ -14,5 +14,4 @@ public class PaymentEntity {
     private Timestamp created;
     private String status;
     private String transaction_id;
-    
 }
