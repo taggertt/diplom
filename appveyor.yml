@@ -27,12 +27,4 @@ build_script:
   - sleep 10
   - sudo chmod +x ./gradlew
   - ./gradlew build --warning-mode all
-  - ./gradlew test -Dselenide.headless=true -Durlbd=jdbc:mysql://localhost:3306/app --scan
-
-artifacts:
-  - path: build/reports/tests/appveyor
-    name: logsAppveyor
-
-
-
-  
+  - ./gradlew test -Dselenide.headless=true -Durlbd=jdbc:mysql://localhost:3306/app --scan 
